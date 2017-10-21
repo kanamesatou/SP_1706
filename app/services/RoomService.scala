@@ -41,10 +41,12 @@ object RoomRepositoryMock extends RoomRepository {
 
   def findByUrl(url: String): Option[Room] = repo.find(_.url == url)
 
-  def entry(room: Room): Option[String] = findByUrl(room.url).map(_ => s"このURLは既に登録されています").fold[Option[String]] {
-    repo += room
-    None
-  }(Some.apply)
+  def entry(room: Room): Option[String] = repo.synchronized {
+    findByUrl(room.url).map(_ => s"このURLは既に登録されています").fold[Option[String]] {
+      repo += room.copy(id = repo.length)
+      None
+    }(Some.apply)
+  }
 }
 
 trait MixInRoomRepository {
