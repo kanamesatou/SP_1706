@@ -12,14 +12,16 @@ class RoomController extends Controller {
   implicit private val self = this
 
   def entryPage = Action {
-    Ok("")
+    Ok(views.html.room.entry())
   }
 
   def entry = Action { implicit request =>
     Room.Form.opt.map { form =>
       RoomService.entry(form)
-      Ok("complete!")
+      Ok(views.html.room.entry_complete(form.url))
     }.orBadRequest
   }
+
+
 
 }
