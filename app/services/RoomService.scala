@@ -47,13 +47,13 @@ object RoomRepositoryImpl extends RoomRepository {
 /**
   * DBを使わないRoomRepositoryの実装
   */
-object RoomRepositoryMock extends RoomRepository {
+class RoomRepositoryMock extends RoomRepository {
   private val repo = ListBuffer.empty[Room]
 
   def entry(roomForm: Room.Form): Option[String] = repo.synchronized {
     findByUrl(roomForm.url).map(_ => s"このURLは既に登録されています").fold[Option[String]] {
       val room = Room(repo.length, roomForm.url, roomForm.name, roomForm.password)
-      repo += room.copy(id = repo.length)
+      repo += room
       None
     }(Some.apply)
   }
@@ -64,7 +64,7 @@ object RoomRepositoryMock extends RoomRepository {
 }
 
 trait MixInRoomRepository {
-  val roomRepository: RoomRepository = RoomRepositoryMock
+  val roomRepository: RoomRepository = new RoomRepositoryMock
 }
 
 trait RoomService extends UsesRoomRepository {
