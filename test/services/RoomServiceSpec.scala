@@ -13,7 +13,7 @@ class RoomServiceSpec extends PlaySpec {
   }
 
   "RoomService" should {
-    val room1 = Room(0, "/test/url", "テストルーム", "password")
+    val room1 = Room.Form("test/url", "テストルーム", "password")
     val room2 = room1.copy(url = "/test/url/xxx")
 
     "Roomのエントリー" in {
