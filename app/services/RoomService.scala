@@ -17,7 +17,7 @@ trait RoomRepository {
     * Roomを登録する
     * URLの重複があった場合はエラーメッセージを返す
     */
-  def entry(room: Room): Option[String]
+  def entry(room: Room.Form): Option[String]
 }
 
 trait UsesRoomRepository {
@@ -30,7 +30,7 @@ trait UsesRoomRepository {
 object RoomRepositoryImpl extends RoomRepository {
   def findByUrl(url: String): Option[Room] = ???
 
-  def entry(room: Room): Option[String] = ???
+  def entry(room: Room.Form): Option[String] = ???
 }
 
 /**
@@ -41,8 +41,9 @@ object RoomRepositoryMock extends RoomRepository {
 
   def findByUrl(url: String): Option[Room] = repo.find(_.url == url)
 
-  def entry(room: Room): Option[String] = repo.synchronized {
-    findByUrl(room.url).map(_ => s"このURLは既に登録されています").fold[Option[String]] {
+  def entry(roomForm: Room.Form): Option[String] = repo.synchronized {
+    findByUrl(roomForm.url).map(_ => s"このURLは既に登録されています").fold[Option[String]] {
+      val room = Room(repo.length, roomForm.url, roomForm.name, roomForm.password)
       repo += room.copy(id = repo.length)
       None
     }(Some.apply)
@@ -59,7 +60,7 @@ trait RoomService extends UsesRoomRepository {
     * Roomをリポジトリに登録する
     * 登録成功時はNone, 失敗時はエラーメッセージを返す
     */
-  def entry(room: Room): Option[String] = roomRepository.entry(room)
+  def entry(roomForm: Room.Form): Option[String] = roomRepository.entry(roomForm)
 
   /**
     * URLに対応するRoomを返す
