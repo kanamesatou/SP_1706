@@ -11,9 +11,8 @@ trait RoomRepository {
 
   /**
     * Roomを登録する
-    * URLの重複があった場合はエラーメッセージを返す
     */
-  def entry(room: Room.Form): Option[String]
+  def entry(room: Room.Form): Option[Room]
 
   /**
     * URLに対応するRoomを返す
@@ -36,7 +35,7 @@ trait UsesRoomRepository {
   */
 object RoomRepositoryImpl extends RoomRepository {
 
-  def entry(room: Room.Form): Option[String] = ???
+  def entry(room: Room.Form): Option[Room] = ???
 
   def findByUrl(url: String): Option[Room] = ???
 
@@ -50,12 +49,12 @@ object RoomRepositoryImpl extends RoomRepository {
 class RoomRepositoryMock extends RoomRepository {
   private val repo = ListBuffer.empty[Room]
 
-  def entry(roomForm: Room.Form): Option[String] = repo.synchronized {
-    findByUrl(roomForm.url).map(_ => s"このURLは既に登録されています").fold[Option[String]] {
+  def entry(roomForm: Room.Form): Option[Room] = repo.synchronized {
+    findByUrl(roomForm.url).fold {
       val room = Room(repo.length, roomForm.url, roomForm.name, roomForm.password)
       repo += room
-      None
-    }(Some.apply)
+      Option(room)
+    }(_ => None)
   }
 
   def findByUrl(url: String): Option[Room] = repo.find(_.url == url)
@@ -71,9 +70,9 @@ trait RoomService extends UsesRoomRepository {
 
   /**
     * Roomをリポジトリに登録する
-    * 登録成功時はNone, 失敗時はエラーメッセージを返す
+    * 登録成功時はRoom, 失敗時はNoneを返す
     */
-  def entry(roomForm: Room.Form): Option[String] = roomRepository.entry(roomForm)
+  def entry(roomForm: Room.Form): Option[Room] = roomRepository.entry(roomForm)
 
   /**
     * URLに対応するRoomを返す
