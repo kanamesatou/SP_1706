@@ -1,6 +1,43 @@
 @import models.data.Room
-@(room: Room)
+@import models.data.User
+@import models.data.Chat.AjaxForm
+@import models.data.Chat.PostForm
+@(room: Room, user: User)
 
 @template.main(room.name) {
-    Ajaxとかでここにチャット表示します
+    <script>
+        function proc() {
+            $.ajax({
+		        type: "@routes.ChatController.ajax.method",
+                url: "@routes.ChatController.ajax",
+                data: "@{AjaxForm.roomId}=@room.id",
+                success: function(json) {
+                    var text = "";
+                    $.each(json, function(i, elem){
+                        text += elem.content + "<br><br>";
+                    });
+
+                    if ($('#chat_area').html() != text) {
+                        $('#chat_area').html(text);
+                    }
+                }
+		     });
+        }
+
+        $(function() {
+            proc();
+            setInterval(function(){
+		        proc();
+	        },3000);
+        });
+    </script>
+    <div id="chat_area">
+
+    </div>
+    @helper.form(action = routes.ChatController.post(room.url)) {
+        <input type="hidden" name="@PostForm.roomId" value="@room.id">
+        <input type="hidden" name="@PostForm.userId" value="@user.id">
+        <textarea name="@PostForm.content"></textarea>
+        <input type="submit" value="投稿">
+    }
 }

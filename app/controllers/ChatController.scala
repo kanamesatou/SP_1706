@@ -15,8 +15,20 @@ class ChatController extends Controller {
   def chatRoom(url: String) = Action { implicit request =>
     User.auth(url) { user =>
       RoomService.findById(user.roomId).map { room =>
-        Ok(views.html.chat.room(room))
+        Ok(views.html.chat.room(room, user))
       }.orInternalServerError
+    }
+  }
+
+  def post(url: String) = Action { implicit request =>
+    User.auth(url) { user =>
+      (for {
+        postForm <- Chat.PostForm.opt
+        chat <- ChatService.post(postForm)
+        room <- RoomService.findById(chat.roomId)
+      } yield {
+        Ok(views.html.chat.room(room, user))
+      }).orBadRequest
     }
   }
 
