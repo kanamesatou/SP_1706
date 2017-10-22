@@ -1,6 +1,7 @@
 package services
 
-import models.data.{LoginForm, Room, User}
+import models.data.Chat.PostForm
+import models.data.{Chat, LoginForm, Room, User}
 import org.scalatestplus.play.PlaySpec
 
 /**
@@ -60,6 +61,22 @@ class ServiceSpec extends PlaySpec {
       UserService.findById(1) mustBe Some(User(1, room2.id, "XXX"))
       UserService.findById(2) mustBe Some(User(2, room2.id, "YYY"))
       UserService.findById(3) mustBe None
+    }
+
+  }
+
+  "ChatService" should {
+
+    "Chatのエントリー" in {
+      ChatService.post(PostForm(room1.id, 0, None, "chat1"))
+      ChatService.post(PostForm(room1.id, 1, None, "chat2")) mustBe None
+      ChatService.post(PostForm(room2.id, 0, None, "chat3")) mustBe None
+      ChatService.post(PostForm(room2.id, 1, None, "chat4"))
+    }
+
+    "Chatの取得" in {
+      ChatService.all(room1.id).length mustBe 1
+      ChatService.all(room2.id).length mustBe 1
     }
 
   }
