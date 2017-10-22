@@ -3,7 +3,7 @@ package models.data
 import play.api.data
 import play.api.data.Forms._
 import play.api.mvc.{Controller, Request, Result}
-import services.UserService
+import services.{RoomService, UserService}
 import util.Extension.FormExtension
 
 import scala.util.Try
@@ -23,8 +23,12 @@ object User {
       .flatMap(UserService.findById)
       .fold(ifFailed)(ifSuccess)
 
+  def authenticate[A](roomId: Long)(ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
+    RoomService.findById(roomId).fold(ifFailed)(r => authenticate(r.url)(ifSuccess)(ifFailed))
+
   def auth(url: String)(ifSuccess: User => Result)(implicit request: Request[_], controller: Controller): Result =
     authenticate(url)(ifSuccess)(controller.Ok(views.html.login(url)))
+
 
   case class Form(nickName: String)
 
