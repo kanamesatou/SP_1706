@@ -14,7 +14,7 @@ import scala.util.Try
 case class User(id: Long, roomId: Long, nickName: String)
 
 object User {
-  private def sessionName(url: String): String = s"pseudcussion[$url]"
+  def sessionName(url: String): String = s"pseudcussion[$url]"
 
   def authenticate[A](url: String)(ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
     request.session
@@ -24,7 +24,7 @@ object User {
       .fold(ifFailed)(ifSuccess)
 
   def auth(url: String)(ifSuccess: User => Result)(implicit request: Request[_], controller: Controller): Result =
-    authenticate(url)(ifSuccess)(controller.Ok("")) // TODO login page
+    authenticate(url)(ifSuccess)(controller.Ok(views.html.login(url)))
 
   case class Form(nickName: String)
 
