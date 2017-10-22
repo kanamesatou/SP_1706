@@ -1,7 +1,7 @@
 package services
 
 import models.data.Chat.PostForm
-import models.data.{Chat, LoginForm, Room, User}
+import models.data.{LoginForm, Room, User}
 import org.scalatestplus.play.PlaySpec
 
 /**
