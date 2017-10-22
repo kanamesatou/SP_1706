@@ -26,6 +26,14 @@ object User {
   def authenticate[A](roomId: Long)(ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
     RoomService.findById(roomId).fold(ifFailed)(r => authenticate(r.url)(ifSuccess)(ifFailed))
 
+  def authenticate[A](ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
+    request.session
+      .data
+        .find { case (key, _) => request.uri.endsWith(key) }
+        .map(_._1)
+        .fold(ifFailed)(url => authenticate(url)(ifSuccess)(ifFailed))
+
+
   def auth(url: String)(ifSuccess: User => Result)(implicit request: Request[_], controller: Controller): Result =
     authenticate(url)(ifSuccess)(controller.Ok(views.html.login(url)))
 
