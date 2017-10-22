@@ -3,6 +3,7 @@ package models.data
 import play.api.data.Forms._
 import play.api.data
 import play.api.data.format.Formats._
+import play.api.libs.json.Json
 import util.Extension.FormExtension
 
 /**
@@ -12,6 +13,8 @@ case class Chat(id: Long, roomId: Long, no: Int, userId: Long,
                 timeStamp: String, replyTo: Option[Long], content: String)
 
 object Chat {
+
+  implicit def jsonWrites = Json.writes[Chat]
 
   case class PostForm(roomId: Long, userId: Long, replyTo: Option[Long], content: String)
 

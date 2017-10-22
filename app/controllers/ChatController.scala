@@ -1,8 +1,9 @@
 package controllers
 
-import models.data.User
+import models.data.{Chat, User}
+import play.api.libs.json.Json
 import play.api.mvc._
-import services.RoomService
+import services.{ChatService, RoomService}
 import util.Extension.OptionExtension
 
 /**
@@ -16,6 +17,12 @@ class ChatController extends Controller {
       RoomService.findById(user.roomId).map { room =>
         Ok(views.html.chat.room(room))
       }.orInternalServerError
+    }
+  }
+
+  def ajax = Action { implicit request =>
+    Chat.AjaxForm.opt.fold(BadRequest("")) { ajax =>
+      Ok(Json.toJson(ChatService.all(ajax.roomId)))
     }
   }
 
