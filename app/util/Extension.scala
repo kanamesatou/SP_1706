@@ -15,6 +15,9 @@ object Extension {
   implicit class OptionExtension(opt: Option[Result]) {
     def orBadRequest(implicit controller: Controller): Result =
       opt.getOrElse(controller.BadRequest("parameter problem."))
+
+    def orInternalServerError(implicit controller: Controller): Result =
+      opt.getOrElse(controller.InternalServerError("sorry, server problem occurred."))
   }
 
 }
