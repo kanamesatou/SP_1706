@@ -1,6 +1,6 @@
 package services
 
-import models.data.{Room, User}
+import models.data.{LoginForm, Room, User}
 import org.scalatestplus.play.PlaySpec
 
 /**
@@ -23,16 +23,23 @@ class ServiceSpec extends PlaySpec {
     }
 
     "RoomのURL検索" in {
-      RoomService.findByUrl("/test/url") mustBe Some(Room(0, "/test/url", "テストルーム", "password"))
-      RoomService.findByUrl("/test/url/xxx") mustBe Some(Room(1, "/test/url/xxx", "テストルーム", "password"))
+      RoomService.findByUrl("/test/url") mustBe Some(room1)
+      RoomService.findByUrl("/test/url/xxx") mustBe Some(room2)
       RoomService.findByUrl("/test/url/xxx/yyy") mustBe None
     }
 
     "Roomのid検索" in {
       RoomService.findById(-1) mustBe None
-      RoomService.findById(0) mustBe Some(Room(0, "/test/url", "テストルーム", "password"))
-      RoomService.findById(1) mustBe Some(Room(1, "/test/url/xxx", "テストルーム", "password"))
+      RoomService.findById(0) mustBe Some(room1)
+      RoomService.findById(1) mustBe Some(room2)
       RoomService.findById(2) mustBe None
+    }
+
+    "Roomにログイン" in {
+      RoomService.login(LoginForm("/test/url", "password")) mustBe Some(room1)
+      RoomService.login(LoginForm("/test/url/xxx", "password")) mustBe Some(room2)
+      RoomService.login(LoginForm("/test/url/yyy", "password")) mustBe None
+      RoomService.login(LoginForm("/test/url", "dummy")) mustBe None
     }
 
   }

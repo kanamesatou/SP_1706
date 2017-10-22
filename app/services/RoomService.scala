@@ -1,6 +1,7 @@
 package services
 
-import models.data.Room
+import models.data.{LoginForm, Room}
+
 import scala.collection.mutable.ListBuffer
 
 
@@ -85,6 +86,13 @@ trait RoomService extends UsesRoomRepository {
     * 存在する場合はRoom, 存在しない場合はNoneを返す
     */
   def findById(id: Long): Option[Room] = roomRepository.findById(id)
+
+  /**
+    * URLとパスワードでログインする
+    * ログイン成功時はRoom, 失敗時はNoneを返す
+    */
+  def login(loginForm: LoginForm): Option[Room] =
+    roomRepository.findByUrl(loginForm.url).filter(_.password == loginForm.password)
 
 }
 
