@@ -34,14 +34,16 @@ object Chat {
     )
   }
 
-  case class AjaxForm(roomId: Long)
+  case class AjaxForm(roomId: Long, no: Int)
 
   object AjaxForm extends FormExtension[AjaxForm] {
     val roomId = "roomId"
+    val no = "no"
 
     val form = data.Form(
       mapping(
-        roomId -> of[Long]
+        roomId -> of[Long],
+        no -> number
       )(AjaxForm.apply)(AjaxForm.unapply)
     )
   }

@@ -11,9 +11,21 @@ import scala.collection.mutable.ListBuffer
   * Created by satou on 2017/10/22.
   */
 trait ChatRepository {
+
+  /**
+    * postFormを投稿し、Chatを返す
+    */
   def post(postForm: PostForm): Chat
 
+  /**
+    * Roomに投稿されたすべてのChatを返す
+    */
   def all(roomId: Long): Seq[Chat]
+
+  /**
+    * Roomに投稿されたnoより後のChatを返す
+    */
+  def versioned(roomId: Long, no: Int): Seq[Chat]
 }
 
 object ChatRepositoryMock extends ChatRepository {
@@ -34,6 +46,8 @@ object ChatRepositoryMock extends ChatRepository {
   }
 
   def all(roomId: Long): Seq[Chat] = repo.filter(_.roomId == roomId).toList
+
+  def versioned(roomId: Long, no: Int): Seq[Chat] = all(roomId).filter(_.no > no)
 }
 
 trait UsesChatRepository {
@@ -65,6 +79,8 @@ trait ChatService extends UsesChatRepository {
     * Roomに投稿されたChatを全て返す
     */
   def all(roomId: Long): Seq[Chat] = chatRepository.all(roomId)
+
+  def versioned(roomId: Long, no: Int): Seq[Chat] = chatRepository.versioned(roomId, no)
 }
 
 object ChatService extends ChatService with MixInChatRepository

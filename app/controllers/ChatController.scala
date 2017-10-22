@@ -34,7 +34,7 @@ class ChatController extends Controller {
 
   def ajax = Action { implicit request =>
     Chat.AjaxForm.opt.fold(BadRequest("")) { ajax =>
-      Ok(Json.toJson(ChatService.all(ajax.roomId)))
+      Ok(Json.toJson(ChatService.versioned(ajax.roomId, ajax.no)))
     }
   }
 

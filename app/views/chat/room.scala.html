@@ -6,20 +6,18 @@
 
 @template.main(room.name) {
     <script>
+        var no = 0;
         function proc() {
             $.ajax({
 		        type: "@routes.ChatController.ajax.method",
                 url: "@routes.ChatController.ajax",
-                data: "@{AjaxForm.roomId}=@room.id",
+                data: "@{AjaxForm.roomId}=@room.id&@{AjaxForm.no}=" + no,
                 success: function(json) {
                     var text = "";
                     $.each(json, function(i, elem){
-                        text += elem.content + "<br><br>";
+                        $('#chat_area').append(elem.content + "<br><br>");
+                        no = elem.no;
                     });
-
-                    if ($('#chat_area').html() != text) {
-                        $('#chat_area').html(text);
-                    }
                 }
 		     });
         }
