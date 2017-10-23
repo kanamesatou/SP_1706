@@ -69,14 +69,22 @@ class ServiceSpec extends PlaySpec {
 
     "Chatのエントリー" in {
       ChatService.post(PostForm(room1.id, 0, None, "chat1"))
-      ChatService.post(PostForm(room1.id, 1, None, "chat2")) mustBe None
-      ChatService.post(PostForm(room2.id, 0, None, "chat3")) mustBe None
-      ChatService.post(PostForm(room2.id, 1, None, "chat4"))
+      ChatService.post(PostForm(room1.id, 0, None, "chat2"))
+      ChatService.post(PostForm(room1.id, 1, None, "chat3")) mustBe None
+      ChatService.post(PostForm(room2.id, 0, None, "chat4")) mustBe None
+      ChatService.post(PostForm(room2.id, 1, None, "chat5"))
     }
 
     "Chatの取得" in {
-      ChatService.all(room1.id).length mustBe 1
+      ChatService.all(room1.id).length mustBe 2
       ChatService.all(room2.id).length mustBe 1
+    }
+
+    "増分Chatの取得" in {
+      ChatService.versioned(room1.id, 0).length mustBe 2
+      ChatService.versioned(room1.id, 1).length mustBe 1
+      ChatService.versioned(room1.id, 2).length mustBe 0
+      ChatService.versioned(room2.id, 0).length mustBe 1
     }
 
   }
