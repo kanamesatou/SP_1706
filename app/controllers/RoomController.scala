@@ -16,10 +16,12 @@ class RoomController extends Controller {
   }
 
   def entry = Action { implicit request =>
-    Room.Form.opt.map { form =>
-      RoomService.entry(form)
-      Ok(views.html.room.entry_complete(form.url))
-    }.orBadRequest
+    (for {
+      form <- Room.Form.opt
+      room <- RoomService.entry(form)
+    } yield {
+      Ok(views.html.room.entry_complete(room.url))
+    }).orBadRequest
   }
 
 
