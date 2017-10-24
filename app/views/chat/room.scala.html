@@ -5,8 +5,11 @@
 @(room: Room, user: User)
 
 @template.main(room.name) {
-    <script>
+<script>
         var no = 0;
+        function escape(str) {
+            return $('<span/>').text(str).html();
+        }
         function proc() {
             $.ajax({
 		        type: "@routes.ChatController.ajax.method",
@@ -16,6 +19,11 @@
                     var text = "";
                     $.each(json, function(i, elem){
                         $('#chat_area').append(elem.content + "<br><br>");
+                        var head = '<div class="head"><span class="no">' + escape(elem.no) +
+                                   ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
+                        var shout = '<div class="shout">' + escape(elem.content) +'</div>'
+                        var good = '<div class="good"><input type="submit" class="goodbtn" value="👍"> 未実装</div>'
+                        $('.comment').append(head + shout + good);
                         no = elem.no;
                     });
                 }
@@ -28,14 +36,17 @@
 		        proc();
 	        },3000);
         });
-    </script>
-    <div id="chat_area">
 
+</script>
+<div class="">
+    <div class="title">議題：@room.name</div>
+    <div class="comment">
     </div>
-    @helper.form(action = routes.ChatController.post(room.url)) {
-        <input type="hidden" name="@PostForm.roomId" value="@room.id">
-        <input type="hidden" name="@PostForm.userId" value="@user.id">
-        <textarea name="@PostForm.content"></textarea>
-        <input type="submit" value="投稿">
-    }
+</div>
+@helper.form(action = routes.ChatController.post(room.url)) {
+<input type="hidden" name="@PostForm.roomId" value="@room.id">
+<input type="hidden" name="@PostForm.userId" value="@user.id">
+<textarea name="@PostForm.content"></textarea>
+<input type="submit" value="投稿">
+}
 }
