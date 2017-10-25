@@ -3,6 +3,7 @@ package services
 import models.data.Evaluation
 
 import scala.collection.mutable.ListBuffer
+import scala.util.Try
 
 /**
   * Created by satou on 2017/10/25.
@@ -55,9 +56,16 @@ trait MixInEvaluationRepository {
 
 trait EvaluationService extends UsesEvaluationRepository {
 
-  def entry(form: Evaluation.Form): Option[Evaluation] =
-    if (!evaluationRepository.exists(form)) evaluationRepository.entry(form)
-    else None
+  /**
+    * Evaluation.Formを登録する
+    * チャット投稿者と同一人物や、2度目のEvaluationは登録せず、Noneを返す
+    */
+  def entry(form: Evaluation.Form): Option[Evaluation] = {
+    Try { ChatService.all(form.roomId)(form.no - 1) }.toOption.flatMap { chat =>
+      if ( chat.userId != form.userId && !evaluationRepository.exists(form)) evaluationRepository.entry(form)
+      else None
+    }
+  }
 
   def all(roomId: Long): Seq[Evaluation] = evaluationRepository.all(roomId)
 
