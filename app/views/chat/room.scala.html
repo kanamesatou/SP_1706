@@ -2,6 +2,7 @@
 @import models.data.User
 @import models.data.Chat.AjaxForm
 @import models.data.Chat.PostForm
+@import models.data.Evaluation
 @(room: Room, user: User)
 
 @template.main(room.name) {
@@ -20,11 +21,10 @@
                     $.each(json, function(i, elem){
                         console.log(elem);
                         no = elem.no;
-                        $('#chat_area').append(elem.content + "<br><br>");
                         var head = '<div class="head"><span class="no">' + escape(elem.no) +
                                    ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
                         var shout = '<div class="shout">' + escape(elem.content) +'</div>'
-                        var good = '<div class="good"><input type="submit" class="goodbtn" value="👍"><span id="good-' + no + '" /></div>'
+                        var good = '<div class="good"><input type="button" data-no="' + no + '" class="goodbtn" value="👍"><span id="good-' + no + '" /></div>'
                         $('.comment').append(head + shout + good);
                     });
                 }
@@ -45,9 +45,44 @@
             });
         }
 
+        function makeEvalPostData(no) {
+            return "@Evaluation.Form.roomId=@room.id&@Evaluation.Form.userId=@user.id&@Evaluation.Form.evaluationType=Good&@Evaluation.Form.no=" + no;
+        }
+
+        function makeContentPostData() {
+            return "@PostForm.roomId=@room.id&@PostForm.userId=@user.id&@PostForm.content=" + $('#content').val();
+        }
+
         $(function() {
             getContentsProc();
             getEvaluationProc();
+            $('#post').on("click", function(){
+                $.ajax({
+                    type: "@routes.ChatController.post.method",
+                    url: "@routes.ChatController.post.url",
+                    data: makeContentPostData(),
+                    success: function(json) {
+                        $('#content').val('');
+                        no = json.no;
+                        var head = '<div class="head"><span class="no">' + escape(json.no) +
+                                   ' :</span><span class="time">' + escape(json.timeStamp) + '</span></div>';
+                        var shout = '<div class="shout">' + escape(json.content) +'</div>'
+                        var good = '<div class="good"><input type="submit" data-no="' + no + '" class="goodbtn" value="👍"><span id="good-' + no + '" /></div>'
+                        $('.comment').append(head + shout + good);
+                    }
+                });
+            });
+            $(document).on('click', '.goodbtn', function(){
+                console.log(makeEvalPostData($(this).data('no')));
+                $.ajax({
+                    type: "@routes.ChatController.evaluationAjax.method",
+                    url: "@routes.ChatController.evaluationAjax.url",
+                    data: makeEvalPostData($(this).data('no')),
+                    success: function() {
+                        getEvaluationProc();
+                    }
+                });
+            });
             setInterval(function(){
 		        getContentsProc();
 		        getEvaluationProc();
@@ -60,10 +95,7 @@
     <div class="comment">
     </div>
 </div>
-@helper.form(action = routes.ChatController.post) {
-<input type="hidden" name="@PostForm.roomId" value="@room.id">
-<input type="hidden" name="@PostForm.userId" value="@user.id">
-<textarea name="@PostForm.content"></textarea>
-<input type="submit" value="投稿">
-}
+
+<textarea id="content" name="@PostForm.content"></textarea>
+<input type="button" id="post" value="投稿">
 }

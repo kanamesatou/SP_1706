@@ -11,7 +11,7 @@ POST    /login                      controllers.SessionController.login
 
 POST    /ajax/chat/get              controllers.ChatController.getAjax
 POST    /ajax/chat/eval             controllers.ChatController.getEvaluationAjax
-
+POST    /ajax/chat/post/eval        controllers.ChatController.evaluationAjax
 
 GET     /chat/$url<.+>              controllers.ChatController.chatRoom(url)
 POST    /post                       controllers.ChatController.post

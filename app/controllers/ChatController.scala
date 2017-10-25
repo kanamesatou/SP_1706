@@ -31,9 +31,9 @@ class ChatController extends Controller with ImplicitValues {
       room <- RoomService.findById(postForm.roomId)
       user <- UserService.findById(postForm.userId)
       if user.roomId == room.id
-      _ <- ChatService.post(postForm)
+      chat <- ChatService.post(postForm)
     } yield {
-      Ok(views.html.chat.room(room, user))
+      Ok(Json.toJson(chat))
     }).orBadRequest
   }
 
@@ -43,6 +43,22 @@ class ChatController extends Controller with ImplicitValues {
         Ok(Json.toJson(ChatService.versioned(ajaxForm.roomId, ajaxForm.no)))
       }(Forbidden)
     }.orBadRequest
+  }
+
+  def evaluationAjax = Action { implicit request =>
+    (for {
+      evaluationForm <- Evaluation.Form.opt
+      _ = println("aaa")
+      room <- RoomService.findById(evaluationForm.roomId)
+      _ = println("aaa")
+      user <- UserService.findById(evaluationForm.userId)
+      _ = println("aaa")
+      if room.id == user.roomId
+      _ = println("aaa")
+      _ <- EvaluationService.entry(evaluationForm)
+    } yield {
+      Ok
+    }).orBadRequest
   }
 
   def getEvaluationAjax = Action { implicit request =>
