@@ -48,13 +48,9 @@ class ChatController extends Controller with ImplicitValues {
   def evaluationAjax = Action { implicit request =>
     (for {
       evaluationForm <- Evaluation.Form.opt
-      _ = println("aaa")
       room <- RoomService.findById(evaluationForm.roomId)
-      _ = println("aaa")
       user <- UserService.findById(evaluationForm.userId)
-      _ = println("aaa")
       if room.id == user.roomId
-      _ = println("aaa")
       _ <- EvaluationService.entry(evaluationForm)
     } yield {
       Ok

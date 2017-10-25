@@ -17,9 +17,7 @@
                 url: "@routes.ChatController.getAjax.url",
                 data: "@AjaxForm.roomId=@room.id&@{AjaxForm.no}=" + no,
                 success: function(json) {
-                    console.log(json);
-                    $.each(json, function(i, elem){
-                        console.log(elem);
+                    $.each(json, function(i, elem) {
                         no = elem.no;
                         var head = '<div class="head"><span class="no">' + escape(elem.no) +
                                    ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
@@ -37,7 +35,6 @@
                 url: "@routes.ChatController.getEvaluationAjax.url",
                 data: "@AjaxForm.roomId=@room.id",
                 success: function(json) {
-                    console.log(json);
                     $.each(json, function(no, num) {
                         $('#good-' + no).text(num);
                     });
@@ -73,7 +70,6 @@
                 });
             });
             $(document).on('click', '.goodbtn', function(){
-                console.log(makeEvalPostData($(this).data('no')));
                 $.ajax({
                     type: "@routes.ChatController.evaluationAjax.method",
                     url: "@routes.ChatController.evaluationAjax.url",
