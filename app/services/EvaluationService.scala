@@ -61,6 +61,9 @@ trait EvaluationService extends UsesEvaluationRepository {
 
   def all(roomId: Long): Seq[Evaluation] = evaluationRepository.all(roomId)
 
+  def resultMap(roomId: Long): Map[Int, Int] = ChatService.all(roomId).map { chat =>
+    chat.no -> all(roomId).count(_.no == chat.no)
+  }.toMap
 }
 
 object EvaluationService extends EvaluationService with MixInEvaluationRepository

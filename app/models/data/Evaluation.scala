@@ -3,16 +3,17 @@ package models.data
 import play.api.data
 import play.api.data.Forms._
 import play.api.data.format.Formats._
+import play.api.libs.json.Json
 import util.Extension.FormExtension
 
 /**
   * Created by satou on 2017/10/21.
   */
-case class Evaluation(id: Long, roomId: Long, no: Int, userId: Long, evaluationType: Evaluation.Type)
+case class Evaluation(id: Long, roomId: Long, no: Int, userId: Long, evaluationType: Evaluation.Type) {
+  def toAjaxResult: Evaluation.AjaxResult = Evaluation.AjaxResult(no, evaluationType.toString)
+}
 
 object Evaluation {
-
-  sealed trait Type
 
   case class Form(roomId: Long, no: Int, userId: Long, evaluationType: String)
 
@@ -33,6 +34,13 @@ object Evaluation {
     )
   }
 
+  case class AjaxResult(no: Int, evaluation: String)
+
+  object AjaxResult {
+    implicit def jsonWrites = Json.writes[AjaxResult]
+  }
+
+  sealed trait Type
 
   object Type {
 
