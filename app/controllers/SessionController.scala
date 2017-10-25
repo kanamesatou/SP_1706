@@ -19,7 +19,7 @@ class SessionController extends Controller {
       user <- UserService.entry(room.url, userForm)
     } yield {
       Redirect(routes.ChatController.chatRoom(room.url)).withSession(
-        request.session + (User.sessionName(room.url), user.id.toString)
+        request.session + (User.sessionName(room.id), user.id.toString)
       )
     }).fold {
       Ok("失敗")

@@ -14,29 +14,19 @@ import scala.util.Try
 case class User(id: Long, roomId: Long, nickName: String)
 
 object User {
-  def sessionName(url: String): String = s"pseudcussion[$url]"
-
-  def authenticate[A](url: String)(ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
-    request.session
-      .get(sessionName(url))
-      .flatMap(id => Try(id.toLong).toOption)
-      .flatMap(UserService.findById)
-      .fold(ifFailed)(ifSuccess)
+  def sessionName(roomId: Long): String = s"pseudcussion-$roomId"
+  private val regex = """pseudcussion-(\d+)""".r
+  def getRoomIdFromSessionName(sessionName: String): Option[Long] = Try {
+    regex.findFirstIn(sessionName).map(_.toLong)
+  }.toOption.flatten
 
   def authenticate[A](roomId: Long)(ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
-    RoomService.findById(roomId).fold(ifFailed)(r => authenticate(r.url)(ifSuccess)(ifFailed))
-
-  def authenticate[A](ifSuccess: User => A)(ifFailed: => A)(implicit request: Request[_]): A =
     request.session
-      .data
-        .find { case (key, _) => request.uri.endsWith(key) }
-        .map(_._1)
-        .fold(ifFailed)(url => authenticate(url)(ifSuccess)(ifFailed))
-
-
-  def auth(url: String)(ifSuccess: User => Result)(implicit request: Request[_], controller: Controller): Result =
-    authenticate(url)(ifSuccess)(controller.Ok(views.html.login(url)))
-
+      .get(sessionName(roomId))
+      .flatMap(id => Try(id.toLong).toOption)
+      .flatMap(UserService.findById)
+      .filter(_.roomId == roomId)
+      .fold(ifFailed)(ifSuccess)
 
   case class Form(nickName: String)
 

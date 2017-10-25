@@ -10,30 +10,47 @@
         function escape(str) {
             return $('<span/>').text(str).html();
         }
-        function proc() {
+        function getContentsProc() {
             $.ajax({
-		        type: "@routes.ChatController.ajax.method",
-                url: "@routes.ChatController.ajax",
-                data: "@{AjaxForm.roomId}=@room.id&@{AjaxForm.no}=" + no,
+		        type: "@routes.ChatController.getAjax.method",
+                url: "@routes.ChatController.getAjax.url",
+                data: "@AjaxForm.roomId=@room.id&@{AjaxForm.no}=" + no,
                 success: function(json) {
-                    var text = "";
+                    console.log(json);
                     $.each(json, function(i, elem){
+                        console.log(elem);
+                        no = elem.no;
                         $('#chat_area').append(elem.content + "<br><br>");
                         var head = '<div class="head"><span class="no">' + escape(elem.no) +
                                    ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
                         var shout = '<div class="shout">' + escape(elem.content) +'</div>'
-                        var good = '<div class="good"><input type="submit" class="goodbtn" value="👍"> 未実装</div>'
+                        var good = '<div class="good"><input type="submit" class="goodbtn" value="👍"><span id="good-' + no + '" /></div>'
                         $('.comment').append(head + shout + good);
-                        no = elem.no;
                     });
                 }
 		     });
         }
 
+        function getEvaluationProc() {
+            $.ajax({
+                type: "@routes.ChatController.getEvaluationAjax.method",
+                url: "@routes.ChatController.getEvaluationAjax.url",
+                data: "@AjaxForm.roomId=@room.id",
+                success: function(json) {
+                    console.log(json);
+                    $.each(json, function(no, num) {
+                        $('#good-' + no).text(num);
+                    });
+                }
+            });
+        }
+
         $(function() {
-            proc();
+            getContentsProc();
+            getEvaluationProc();
             setInterval(function(){
-		        proc();
+		        getContentsProc();
+		        getEvaluationProc();
 	        },3000);
         });
 
@@ -43,7 +60,7 @@
     <div class="comment">
     </div>
 </div>
-@helper.form(action = routes.ChatController.post(room.url)) {
+@helper.form(action = routes.ChatController.post) {
 <input type="hidden" name="@PostForm.roomId" value="@room.id">
 <input type="hidden" name="@PostForm.userId" value="@user.id">
 <textarea name="@PostForm.content"></textarea>
