@@ -1,7 +1,8 @@
 package services
 
 import models.data.Chat.PostForm
-import models.data.{LoginForm, Room, User}
+import models.data.Evaluation.Good
+import models.data.{Evaluation, LoginForm, Room, User}
 import org.scalatestplus.play.PlaySpec
 
 /**
@@ -86,6 +87,25 @@ class ServiceSpec extends PlaySpec {
       ChatService.versioned(room1.id, 2).length mustBe 0
       ChatService.versioned(room2.id, 0).length mustBe 1
     }
+
+  }
+
+  "EvaluationService" should {
+
+    "Evaluationのエントリー" in {
+      EvaluationService.entry(Evaluation.Form(0, 0, 1, "Good")) mustBe Some(Evaluation(0, 0, 0, 1, Good))
+      EvaluationService.entry(Evaluation.Form(1, 0, 1, "Good")) mustBe Some(Evaluation(1, 1, 0, 1, Good))
+      EvaluationService.entry(Evaluation.Form(1, 0, 2, "Good")) mustBe Some(Evaluation(2, 1, 0, 2, Good))
+      EvaluationService.entry(Evaluation.Form(0, 0, 1, "Good")) mustBe None
+      EvaluationService.entry(Evaluation.Form(0, 0, 2, "Gooood")) mustBe None
+    }
+
+    "Evaluationの取得" in {
+      EvaluationService.all(0).length mustBe 1
+      EvaluationService.all(1).length mustBe 2
+      EvaluationService.all(2).length mustBe 0
+    }
+
 
   }
 
