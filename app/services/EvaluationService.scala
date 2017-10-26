@@ -58,7 +58,7 @@ trait EvaluationService extends UsesEvaluationRepository {
 
   /**
     * Evaluation.Formを登録する
-    * チャット投稿者と同一人物や、2度目のEvaluationは登録せず、Noneを返す
+    * Chat投稿者と同一人物や、2度目のEvaluationは登録せず、Noneを返す
     */
   def entry(form: Evaluation.Form): Option[Evaluation] = {
     Try { ChatService.all(form.roomId)(form.no - 1) }.toOption.flatMap { chat =>
@@ -67,8 +67,14 @@ trait EvaluationService extends UsesEvaluationRepository {
     }
   }
 
+  /**
+    * Room内のすべてのEvaluationを取得する
+    */
   def all(roomId: Long): Seq[Evaluation] = evaluationRepository.all(roomId)
 
+  /**
+    * Room内のすべてのChatに対し、いくつEvaluationがあるかをカウントする
+    */
   def resultMap(roomId: Long): Map[Int, Int] = ChatService.all(roomId).map { chat =>
     chat.no -> all(roomId).count(_.no == chat.no)
   }.toMap
