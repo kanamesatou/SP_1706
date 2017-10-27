@@ -1,6 +1,7 @@
 package services
 
 import models.data.Evaluation
+import models.data.Evaluation.FromForm
 
 import scala.collection.mutable.ListBuffer
 import scala.util.Try
@@ -87,13 +88,13 @@ trait EvaluationService extends UsesEvaluationRepository {
     * Room内の自身の発言に対するEvaluationの送信元Userのニックネームを
     * 発言ごとにまとめて返す
     */
-  def evaluationFrom(roomId: Long, userId: Long): Map[Int, Seq[String]] = {
+  def evaluationFrom(fromForm: FromForm): Map[Int, Seq[String]] = {
     ChatService
-      .all(roomId)
-      .filter(_.userId == userId)
+      .all(fromForm.roomId)
+      .filter(_.userId == fromForm.userId)
       .map { chat =>
         chat.no ->
-          all(roomId)
+          all(fromForm.roomId)
             .filter(_.no == chat.no)
             .flatMap(eval => UserService.findById(eval.userId).map(_.nickName))
       }
