@@ -34,6 +34,20 @@ object Evaluation {
     )
   }
 
+
+  case class FromForm(roomId: Long, userId: Long)
+
+  object FromForm extends FormExtension[FromForm] {
+    val roomId = "roomId"
+    val userId = "userId"
+    val form = data.Form(
+      mapping(
+        roomId -> of[Long],
+        userId -> of[Long]
+      )(FromForm.apply)(FromForm.unapply)
+    )
+  }
+
   case class AjaxResult(no: Int, evaluation: String)
 
   object AjaxResult {
