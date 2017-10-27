@@ -19,7 +19,7 @@ class ChatController extends Controller with Extension.MapJsonWrite {
 
   def chatRoom(url: String) = Action { implicit request =>
     RoomService.findByUrl(url).map { room =>
-      User.authenticate(room.id) { user =>
+      User.authenticate(room.id){ user =>
         Ok(views.html.chat.room(room, user))
       }(Ok(views.html.login(room.url)))
     }.getOrElse(BadRequest)
@@ -28,6 +28,7 @@ class ChatController extends Controller with Extension.MapJsonWrite {
   def postApi = Action { implicit request =>
     (for {
       postForm <- PostForm.opt
+      if User.authGuard(postForm)(postForm.roomId)
       room <- RoomService.findById(postForm.roomId)
       user <- UserService.findById(postForm.userId)
       if user.roomId == room.id
@@ -39,7 +40,7 @@ class ChatController extends Controller with Extension.MapJsonWrite {
 
   def getApi = Action { implicit request =>
     Chat.AjaxForm.opt.map { ajaxForm =>
-      User.authenticate(ajaxForm.roomId) { _ =>
+      User.authenticate(ajaxForm)(ajaxForm.roomId) { _ =>
         Ok(Json.toJson(ChatService.versioned(ajaxForm.roomId, ajaxForm.no)))
       }(Forbidden)
     }.orBadRequest
@@ -48,6 +49,7 @@ class ChatController extends Controller with Extension.MapJsonWrite {
   def evaluationApi = Action { implicit request =>
     (for {
       evaluationForm <- Evaluation.Form.opt
+      if User.authGuard(evaluationForm)(evaluationForm.roomId)
       room <- RoomService.findById(evaluationForm.roomId)
       user <- UserService.findById(evaluationForm.userId)
       if room.id == user.roomId
@@ -71,7 +73,9 @@ class ChatController extends Controller with Extension.MapJsonWrite {
 
   def getEvaluationFromApi = Action { implicit request =>
     Evaluation.FromForm.opt.map { form =>
-      Ok(Json.toJson(EvaluationService.evaluationFrom(form)))
+      User.authenticate(form)(form.roomId) { _ =>
+        Ok(Json.toJson(EvaluationService.evaluationFrom(form)))
+      }(Forbidden)
     }.orBadRequest
   }
 

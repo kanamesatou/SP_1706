@@ -4,18 +4,18 @@ import play.api.data
 import play.api.data.Forms._
 import play.api.data.format.Formats._
 import play.api.libs.json.Json
-import util.Extension.FormExtension
+import util.Extension.{AuthenticatableForm, FormExtension}
 
 /**
   * Created by satou on 2017/10/21.
   */
-case class Evaluation(id: Long, roomId: Long, no: Int, userId: Long, evaluationType: Evaluation.Type) {
+case class Evaluation(id: Long, roomId: Long, no: Int, userId: Long, evaluationType: Evaluation.Type) extends AuthenticatableForm {
   def toAjaxResult: Evaluation.AjaxResult = Evaluation.AjaxResult(no, evaluationType.toString)
 }
 
 object Evaluation {
 
-  case class Form(roomId: Long, no: Int, userId: Long, evaluationType: String)
+  case class Form(roomId: Long, no: Int, userId: Long, evaluationType: String) extends AuthenticatableForm
 
   object Form extends FormExtension[Form] {
 
@@ -35,7 +35,7 @@ object Evaluation {
   }
 
 
-  case class FromForm(roomId: Long, userId: Long)
+  case class FromForm(roomId: Long, userId: Long) extends AuthenticatableForm
 
   object FromForm extends FormExtension[FromForm] {
     val roomId = "roomId"
