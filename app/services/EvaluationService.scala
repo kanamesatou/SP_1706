@@ -38,8 +38,8 @@ object EvaluationRepositoryMock extends EvaluationRepository {
 
   def exists(form: Evaluation.Form): Boolean = repo.exists { eval =>
     eval.roomId == form.roomId &&
-    eval.no == form.no &&
-    eval.userId == form.userId
+      eval.no == form.no &&
+      eval.userId == form.userId
   }
 
   def all(roomId: Long): Seq[Evaluation] = repo.filter(_.roomId == roomId)
@@ -58,13 +58,16 @@ trait EvaluationService extends UsesEvaluationRepository {
 
   /**
     * Evaluation.Formを登録する
-    * Chat投稿者と同一人物や、2度目のEvaluationは登録せず、Noneを返す
+    * Chat投稿者と同一人物のEvaluationやRoomに存在しないUserからのEvaluation、2度目のEvaluationは登録せずNoneを返す
     */
   def entry(form: Evaluation.Form): Option[Evaluation] = {
-    Try { ChatService.all(form.roomId)(form.no - 1) }.toOption.flatMap { chat =>
-      if ( chat.userId != form.userId && !evaluationRepository.exists(form)) evaluationRepository.entry(form)
-      else None
-    }
+    for {
+      _ <- UserService.findById(form.userId)
+      chat <- Try(ChatService.all(form.roomId)(form.no - 1)).toOption
+      if chat.userId != form.userId
+      if !evaluationRepository.exists(form)
+      result <- evaluationRepository.entry(form)
+    } yield result
   }
 
   /**
@@ -73,11 +76,30 @@ trait EvaluationService extends UsesEvaluationRepository {
   def all(roomId: Long): Seq[Evaluation] = evaluationRepository.all(roomId)
 
   /**
-    * Room内のすべてのChatに対し、いくつEvaluationがあるかをカウントする
+    * Room内のすべてのChatに対し、いくつEvaluationがあるかをカウントし、
+    * Map[no, count]の形式で返す
     */
   def resultMap(roomId: Long): Map[Int, Int] = ChatService.all(roomId).map { chat =>
     chat.no -> all(roomId).count(_.no == chat.no)
   }.toMap
+
+  /**
+    * Room内の自身の発言に対するEvaluationの送信元Userのニックネームを
+    * 発言ごとにまとめて返す
+    */
+  def evaluationFrom(roomId: Long, userId: Long): Map[Int, Seq[String]] = {
+    ChatService
+      .all(roomId)
+      .filter(_.userId == userId)
+      .map { chat =>
+        chat.no ->
+          all(roomId)
+            .filter(_.no == chat.no)
+            .flatMap(eval => UserService.findById(eval.userId).map(_.nickName))
+      }
+      .groupBy(_._1)
+      .mapValues(_.flatMap(_._2))
+  }
 }
 
 object EvaluationService extends EvaluationService with MixInEvaluationRepository

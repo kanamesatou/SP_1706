@@ -54,6 +54,8 @@ class ServiceSpec extends PlaySpec {
       UserService.entry("/test/url/xxx", User.Form("XXX")) mustBe Some(User(1, room2.id, "XXX"))
       UserService.entry("/test/url/xxx", User.Form("YYY")) mustBe Some(User(2, room2.id, "YYY"))
       UserService.entry("/test/url/yyy", User.Form("ZZZ")) mustBe None
+      UserService.entry("/test/url", User.Form("EvaluationUser")) mustBe Some(User(3, room1.id, "EvaluationUser"))
+      UserService.entry("/test/url/xxx", User.Form("EvaluationUser")) mustBe Some(User(4, room2.id, "EvaluationUser"))
     }
 
     "Userのid検索" in {
@@ -61,7 +63,8 @@ class ServiceSpec extends PlaySpec {
       UserService.findById(0) mustBe Some(User(0, room1.id, "XXX"))
       UserService.findById(1) mustBe Some(User(1, room2.id, "XXX"))
       UserService.findById(2) mustBe Some(User(2, room2.id, "YYY"))
-      UserService.findById(3) mustBe None
+      UserService.findById(3) mustBe Some(User(3, room1.id, "EvaluationUser"))
+      UserService.findById(4) mustBe Some(User(4, room2.id, "EvaluationUser"))
     }
 
   }
@@ -93,19 +96,32 @@ class ServiceSpec extends PlaySpec {
   "EvaluationService" should {
 
     "Evaluationのエントリー" in {
-      EvaluationService.entry(Evaluation.Form(0, 0, 1, "Good")) mustBe Some(Evaluation(0, 0, 0, 1, Good))
-      EvaluationService.entry(Evaluation.Form(1, 0, 1, "Good")) mustBe Some(Evaluation(1, 1, 0, 1, Good))
-      EvaluationService.entry(Evaluation.Form(1, 0, 2, "Good")) mustBe Some(Evaluation(2, 1, 0, 2, Good))
-      EvaluationService.entry(Evaluation.Form(0, 0, 1, "Good")) mustBe None
-      EvaluationService.entry(Evaluation.Form(0, 0, 2, "Gooood")) mustBe None
+      // room1 --> id 0
+      //    1: userId 0
+      //    2: userId 0
+      // room2 --> id 1
+      //    1: userId 1
+      // Evaluation.Form(roomId, no, userId, evaluationType)
+      EvaluationService.entry(Evaluation.Form(0, 1, 3, "Good")) mustBe Some(Evaluation(0, 0, 1, 3, Good))
+      EvaluationService.entry(Evaluation.Form(0, 2, 3, "Good")) mustBe Some(Evaluation(1, 0, 2, 3, Good))
+      EvaluationService.entry(Evaluation.Form(0, 3, 3, "Good")) mustBe None     // 存在しないnoには評価できない
+      EvaluationService.entry(Evaluation.Form(1, 1, 4, "Good")) mustBe Some(Evaluation(2, 1, 1, 4, Good))
+      EvaluationService.entry(Evaluation.Form(1, 1, 4, "Good")) mustBe None     // 全く同じ評価は2度できない
+      EvaluationService.entry(Evaluation.Form(0, 1, 0, "Good")) mustBe None     // 投稿者は評価できない
+      EvaluationService.entry(Evaluation.Form(0, 1, 3, "Gooood")) mustBe None
     }
 
     "Evaluationの取得" in {
-      EvaluationService.all(0).length mustBe 1
-      EvaluationService.all(1).length mustBe 2
+      EvaluationService.all(0).length mustBe 2
+      EvaluationService.all(1).length mustBe 1
       EvaluationService.all(2).length mustBe 0
     }
 
+    "評価元ニックネームの取得" in {
+      EvaluationService.evaluationFrom(0, 0) mustBe Map(1 -> Seq("EvaluationUser"), 2 -> Seq("EvaluationUser"))
+      EvaluationService.evaluationFrom(0, 1) mustBe Map.empty
+      EvaluationService.evaluationFrom(1, 1) mustBe Map(1 -> Seq("EvaluationUser"))
+    }
 
   }
 
