@@ -1,6 +1,8 @@
 package util
 
 import play.api.data.Form
+import play.api.libs.json.Json.JsValueWrapper
+import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.{Controller, Request, Result}
 
 /**
@@ -19,5 +21,25 @@ object Extension {
     def orInternalServerError(implicit controller: Controller): Result =
       opt.getOrElse(controller.InternalServerError("sorry, server problem occurred."))
   }
+
+  trait MapJsonWrite {
+    protected implicit val mapInt2IntWrites: Writes[Map[Int, Int]] = new Writes[Map[Int, Int]] {
+      def writes(map: Map[Int, Int]): JsValue =
+        Json.obj(map.map{case (s, o) =>
+          val ret: (String, JsValueWrapper) = s.toString -> o
+          ret
+        }.toSeq:_*)
+    }
+
+    protected implicit val mapInt2SeqStringWrites: Writes[Map[Int, Seq[String]]] = new Writes[Map[Int, Seq[String]]] {
+      def writes(map: Map[Int, Seq[String]]): JsValue =
+        Json.obj(map.map {
+          case (key, value) =>
+            val ret: (String, JsValueWrapper) = key.toString -> value
+            ret
+        }.toSeq:_*)
+    }
+  }
+
 
 }
