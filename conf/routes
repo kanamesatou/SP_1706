@@ -9,12 +9,12 @@ POST    /room/entry                 controllers.RoomController.entry
 
 POST    /login                      controllers.SessionController.login
 
-POST    /ajax/chat/get              controllers.ChatController.getAjax
-POST    /ajax/chat/eval             controllers.ChatController.getEvaluationAjax
-POST    /ajax/chat/post/eval        controllers.ChatController.evaluationAjax
+POST    /ajax/chat/get              controllers.ChatController.getApi
+POST    /ajax/chat/eval             controllers.ChatController.getEvaluationApi
+POST    /ajax/chat/post/eval        controllers.ChatController.evaluationApi
 
 GET     /chat/$url<.+>              controllers.ChatController.chatRoom(url)
-POST    /post                       controllers.ChatController.post
+POST    /post                       controllers.ChatController.postApi
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -13,8 +13,8 @@
         }
         function getContentsProc() {
             $.ajax({
-		        type: "@routes.ChatController.getAjax.method",
-                url: "@routes.ChatController.getAjax.url",
+		        type: "@routes.ChatController.getApi.method",
+                url: "@routes.ChatController.getApi.url",
                 data: "@AjaxForm.roomId=@room.id&@{AjaxForm.no}=" + no,
                 success: function(json) {
                     $.each(json, function(i, elem) {
@@ -31,8 +31,8 @@
 
         function getEvaluationProc() {
             $.ajax({
-                type: "@routes.ChatController.getEvaluationAjax.method",
-                url: "@routes.ChatController.getEvaluationAjax.url",
+                type: "@routes.ChatController.getEvaluationApi.method",
+                url: "@routes.ChatController.getEvaluationApi.url",
                 data: "@AjaxForm.roomId=@room.id",
                 success: function(json) {
                     $.each(json, function(no, num) {
@@ -55,8 +55,8 @@
             getEvaluationProc();
             $('#post').on("click", function(){
                 $.ajax({
-                    type: "@routes.ChatController.post.method",
-                    url: "@routes.ChatController.post.url",
+                    type: "@routes.ChatController.postApi.method",
+                    url: "@routes.ChatController.postApi.url",
                     data: makeContentPostData(),
                     success: function(json) {
                         $('#content').val('');
@@ -71,8 +71,8 @@
             });
             $(document).on('click', '.goodbtn', function(){
                 $.ajax({
-                    type: "@routes.ChatController.evaluationAjax.method",
-                    url: "@routes.ChatController.evaluationAjax.url",
+                    type: "@routes.ChatController.evaluationApi.method",
+                    url: "@routes.ChatController.evaluationApi.url",
                     data: makeEvalPostData($(this).data('no')),
                     success: function() {
                         getEvaluationProc();

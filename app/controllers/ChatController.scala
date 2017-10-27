@@ -25,7 +25,7 @@ class ChatController extends Controller with ImplicitValues {
     }.getOrElse(BadRequest)
   }
 
-  def post = Action { implicit request =>
+  def postApi = Action { implicit request =>
     (for {
       postForm <- PostForm.opt
       room <- RoomService.findById(postForm.roomId)
@@ -37,7 +37,7 @@ class ChatController extends Controller with ImplicitValues {
     }).orBadRequest
   }
 
-  def getAjax = Action { implicit request =>
+  def getApi = Action { implicit request =>
     Chat.AjaxForm.opt.map { ajaxForm =>
       User.authenticate(ajaxForm.roomId) { _ =>
         Ok(Json.toJson(ChatService.versioned(ajaxForm.roomId, ajaxForm.no)))
@@ -45,7 +45,7 @@ class ChatController extends Controller with ImplicitValues {
     }.orBadRequest
   }
 
-  def evaluationAjax = Action { implicit request =>
+  def evaluationApi = Action { implicit request =>
     (for {
       evaluationForm <- Evaluation.Form.opt
       room <- RoomService.findById(evaluationForm.roomId)
@@ -57,7 +57,7 @@ class ChatController extends Controller with ImplicitValues {
     }).orBadRequest
   }
 
-  def getEvaluationAjax = Action { implicit request =>
+  def getEvaluationApi = Action { implicit request =>
     Form(AjaxForm.roomId -> of[Long]).bindFromRequest.fold(
       _ => BadRequest
       ,
