@@ -9,9 +9,9 @@ POST    /room/entry                 controllers.RoomController.entry
 
 POST    /login                      controllers.SessionController.login
 
-POST    /ajax/chat/get              controllers.ChatController.getApi
-POST    /ajax/chat/eval             controllers.ChatController.getEvaluationApi
-POST    /ajax/chat/post/eval        controllers.ChatController.evaluationApi
+POST    /api/chat/get              controllers.ChatController.getApi
+POST    /api/chat/eval             controllers.ChatController.getEvaluationApi
+POST    /api/chat/post/eval        controllers.ChatController.evaluationApi
 
 GET     /chat/$url<.+>              controllers.ChatController.chatRoom(url)
 POST    /post                       controllers.ChatController.postApi
