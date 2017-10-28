@@ -35,7 +35,7 @@ object ChatRepositoryMock extends ChatRepository {
   def post(postForm: PostForm): Chat = repo.synchronized {
     val replyTo =
       ChatService.simpleReplyTo(postForm.content)
-      .filter(no => versioned(postForm.roomId, no).nonEmpty)
+      .filter(no => versioned(postForm.roomId, no - 1).nonEmpty)
     val chat = Chat(
       id = repo.length,
       roomId = postForm.roomId,
