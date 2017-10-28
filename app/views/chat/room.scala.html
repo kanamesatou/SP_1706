@@ -26,9 +26,14 @@
                             console.log('replyNo -> ' + tooltipTextNo);
                             var tooltipText = "";
                             if (tooltipTextNo != undefined) {
-                                tooltipText = '<div class="tooltiptext">' + $('#shout-' + tooltipTextNo).html() + '</div>';
+                                if (!($('#shout-' + tooltipTextNo + ' > .tooltiptext')[0])) {
+                                    tooltipText = '<div class="tooltiptext">' + $('#shout-' + tooltipTextNo).html() + '</div>';
+                                } else {
+                                    var nextTooltip = $('#shout-' + tooltipTextNo + ' > .tooltiptext').html();
+                                    var addTooltip = $('#shout-' + tooltipTextNo).text();
+                                    tooltipText = '<div class="tooltiptext">' + nextTooltip + '<br><hr>' + addTooltip.slice(nextTooltip.length) + '</div>';
+                                }
                             }
-                            console.log('tooltipText -> ' + tooltipText);
                             var head = '<div class="head"><span class="no">' + escape(elem.no) +
                                        ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
                             var shout = '<div id="shout-' + no + '" class="tooltip shout">' + tooltipText + escape(elem.content) +'</div>'
