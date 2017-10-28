@@ -12,6 +12,7 @@
         function escape(str) {
             return $('<span/>').text(str).html().replace(/\r?\n/g, '<br>');
         }
+
         function getContentsProc() {
             $.ajax({
 		        type: "@routes.ChatController.getApi.method",
@@ -20,11 +21,20 @@
                 success: function(json) {
                     $.each(json, function(i, elem) {
                         no = elem.no;
-                        var head = '<div class="head"><span class="no">' + escape(elem.no) +
-                                   ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
-                        var shout = '<div class="shout">' + escape(elem.content) +'</div>'
-                        var good = '<div class="good"><div class="tooltip"><input type="button" data-no="' + no + '" class="goodbtn" value="👍"><span id="good-' + no + '" /><span id="tt-' + no + '"></span></div></div>'
-                        $('.comment').append(head + shout + good);
+                        if (!($('#chat-' + no)[0])) {
+                            var tooltipTextNo = elem.replyTo;
+                            console.log('replyNo -> ' + tooltipTextNo);
+                            var tooltipText = "";
+                            if (tooltipTextNo != undefined) {
+                                tooltipText = '<div class="tooltiptext">' + $('#shout-' + tooltipTextNo).html() + '</div>';
+                            }
+                            console.log('tooltipText -> ' + tooltipText);
+                            var head = '<div class="head"><span class="no">' + escape(elem.no) +
+                                       ' :</span><span class="time">' + escape(elem.timeStamp) + '</span></div>';
+                            var shout = '<div id="shout-' + no + '" class="tooltip shout">' + tooltipText + escape(elem.content) +'</div>'
+                            var good = '<div class="good"><div class="tooltip"><input type="button" data-no="' + no + '" class="goodbtn" value="👍"><span id="good-' + no + '" /><span id="tt-' + no + '"></span></div></div>'
+                            $('.comment').append(head + shout + good);
+                        }
                     });
                 }
 		     });

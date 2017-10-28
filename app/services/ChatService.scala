@@ -6,6 +6,7 @@ import models.data.Chat
 import models.data.Chat.PostForm
 
 import scala.collection.mutable.ListBuffer
+import scala.util.matching.Regex
 
 /**
   * Created by satou on 2017/10/22.
@@ -32,13 +33,16 @@ object ChatRepositoryMock extends ChatRepository {
   private val repo = ListBuffer.empty[Chat]
 
   def post(postForm: PostForm): Chat = repo.synchronized {
+    val replyTo =
+      ChatService.simpleReplyTo(postForm.content)
+      .filter(no => versioned(postForm.roomId, no).nonEmpty)
     val chat = Chat(
       id = repo.length,
       roomId = postForm.roomId,
       no = repo.count(_.roomId == postForm.roomId) + 1,
       userId = postForm.userId,
       timeStamp = "%tY-%<tm-%<td %<tH:%<tM:%<tS" format new Date,
-      replyTo = postForm.replyTo,
+      replyTo = replyTo,
       content = postForm.content
     )
     repo += chat
@@ -61,6 +65,9 @@ trait MixInChatRepository {
 
 
 trait ChatService extends UsesChatRepository {
+  private val replyRegex: Regex = "^(@|＠)(\\d+)".r
+  def simpleReplyTo(content: String): Option[Int] =
+    replyRegex.findFirstMatchIn(content).map(_.group(2).toInt)
 
   /**
     * PostFormをもとにChatを登録する
@@ -86,7 +93,7 @@ trait ChatService extends UsesChatRepository {
   def all(roomId: Long): Seq[Chat] = chatRepository.all(roomId)
 
   /**
-    * TODO
+    * Roomに投稿されたChatをno以降のもののみ返す
     */
   def versioned(roomId: Long, no: Int): Seq[Chat] = chatRepository.versioned(roomId, no)
 }

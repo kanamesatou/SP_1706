@@ -10,25 +10,30 @@ import util.Extension.{AuthenticatableForm, FormExtension}
   * Created by satou on 2017/10/21.
   */
 case class Chat(id: Long, roomId: Long, no: Int, userId: Long,
-                timeStamp: String, replyTo: Option[Long], content: String)
+                timeStamp: String, replyTo: Option[Int], content: String) {
+  def toResult: Chat.Result = Chat.Result(
+    no,
+    timeStamp,
+    replyTo,
+    content
+  )
+}
 
 object Chat {
 
   implicit def jsonWrites = Json.writes[Chat]
 
-  case class PostForm(roomId: Long, userId: Long, replyTo: Option[Long], content: String) extends AuthenticatableForm
+  case class PostForm(roomId: Long, userId: Long, content: String) extends AuthenticatableForm
 
   object PostForm extends FormExtension[PostForm] {
     val roomId = "roomId"
     val userId = "userId"
-    val replyTo = "replyTo"
     val content = "content"
 
     val form = data.Form(
       mapping(
         roomId -> of[Long],
         userId -> of[Long],
-        replyTo -> optional(of[Long]),
         content -> text
       )(PostForm.apply)(PostForm.unapply)
     )
@@ -48,6 +53,12 @@ object Chat {
         no -> number
       )(AjaxForm.apply)(AjaxForm.unapply)
     )
+  }
+
+  case class Result(no: Int, timeStamp: String, replyTo: Option[Int], content: String)
+
+  object Result {
+    implicit def jsonWrites = Json.writes[Result]
   }
 
 }
