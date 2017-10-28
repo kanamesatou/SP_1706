@@ -101,6 +101,19 @@ trait EvaluationService extends UsesEvaluationRepository {
       .groupBy(_._1)
       .mapValues(_.flatMap(_._2))
   }
+
+  /**
+    * Room内のChatを、Evaluationの昇順・noの降順に並び替え、その順にnoを返す
+    */
+  def ranking(roomId: Long): Seq[Int] =
+    all(roomId)
+      .groupBy(_.no)
+      .mapValues(_.size)
+      .toSeq
+      .sortWith {
+        case ((n1, e1), (n2, e2)) => e1 > e2 || n1 < n2
+      }
+      .map(_._1)
 }
 
 object EvaluationService extends EvaluationService with MixInEvaluationRepository
