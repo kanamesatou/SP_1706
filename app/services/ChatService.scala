@@ -50,6 +50,7 @@ object ChatRepositoryMock extends ChatRepository {
   def versioned(roomId: Long, no: Int): Seq[Chat] = all(roomId).filter(_.no > no)
 }
 
+
 trait UsesChatRepository {
   val chatRepository: ChatRepository
 }
@@ -72,7 +73,11 @@ trait ChatService extends UsesChatRepository {
       room <- RoomService.findById(postForm.roomId)
       user <- UserService.findById(postForm.userId)
       if room.id == user.roomId
-    } yield chatRepository.post(postForm)
+    } yield {
+      val res = chatRepository.post(postForm)
+      println(UserService.findById(res.userId) -> res)
+      res
+    }
   }
 
   /**
@@ -80,6 +85,9 @@ trait ChatService extends UsesChatRepository {
     */
   def all(roomId: Long): Seq[Chat] = chatRepository.all(roomId)
 
+  /**
+    * TODO
+    */
   def versioned(roomId: Long, no: Int): Seq[Chat] = chatRepository.versioned(roomId, no)
 }
 
