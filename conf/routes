@@ -13,6 +13,7 @@ POST    /api/chat/get               controllers.ChatController.getApi
 POST    /api/chat/eval              controllers.ChatController.getEvaluationApi
 POST    /api/chat/eval/post         controllers.ChatController.evaluationApi
 POST    /api/chat/eval/from         controllers.ChatController.getEvaluationFromApi
+POST    /api/chat/ranking           controllers.ChatController.rankingApi
 
 GET     /chat/$url<.+>              controllers.ChatController.chatRoom(url)
 POST    /post                       controllers.ChatController.postApi

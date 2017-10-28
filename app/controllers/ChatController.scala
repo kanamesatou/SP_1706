@@ -1,7 +1,7 @@
 package controllers
 
 import models.data.Chat.{AjaxForm, PostForm}
-import models.data.{Chat, Evaluation, User}
+import models.data.{Chat, Evaluation, RoomIdForm, User}
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.format.Formats._
@@ -60,21 +60,27 @@ class ChatController extends Controller with Extension.MapJsonWrite {
   }
 
   def getEvaluationApi = Action { implicit request =>
-    Form(AjaxForm.roomId -> of[Long]).bindFromRequest.fold(
-      _ => BadRequest
-      ,
-      roomId => {
-        User.authenticate(roomId) { _ =>
-          Ok(Json.toJson(EvaluationService.resultMap(roomId)))
-        }(Forbidden)
-      }
-    )
+    RoomIdForm.opt.map { form =>
+      User.authenticate(form.roomId) { _ =>
+        Ok(Json.toJson(EvaluationService.resultMap(form.roomId)))
+      }(Forbidden)
+    }.orBadRequest
   }
 
   def getEvaluationFromApi = Action { implicit request =>
     Evaluation.FromForm.opt.map { form =>
       User.authenticate(form)(form.roomId) { _ =>
         Ok(Json.toJson(EvaluationService.evaluationFrom(form)))
+      }(Forbidden)
+    }.orBadRequest
+  }
+
+  def rankingApi = Action { implicit request =>
+    RoomIdForm.opt.map { form =>
+      User.authenticate(form.roomId) { _ =>
+        val ranking = EvaluationService.ranking(form.roomId)
+        val all = ChatService.all(form.roomId).map(_.toResult)
+        Ok(Json.toJson(ranking.flatMap(no => all.find(_.no == no))))
       }(Forbidden)
     }.orBadRequest
   }
