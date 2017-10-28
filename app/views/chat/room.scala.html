@@ -84,6 +84,7 @@
                 });
             });
             $(document).on('click', '.goodbtn', function(){
+                getContentsProc();
                 $.ajax({
                     type: "@routes.ChatController.evaluationApi.method",
                     url: "@routes.ChatController.evaluationApi.url",
