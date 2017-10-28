@@ -16,7 +16,7 @@
             $.ajax({
 		        type: "@routes.ChatController.getApi.method",
                 url: "@routes.ChatController.getApi.url",
-                data: "@AjaxForm.roomId=@room.id&@{AjaxForm.no}=" + no,
+                data: "@AjaxForm.userId=@user.id&@AjaxForm.roomId=@room.id&@{AjaxForm.no}=" + no,
                 success: function(json) {
                     $.each(json, function(i, elem) {
                         no = elem.no;
