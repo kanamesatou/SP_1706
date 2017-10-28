@@ -10,7 +10,7 @@
 <script>
         var no = 0;
         function escape(str) {
-            return $('<span/>').text(str).html();
+            return $('<span/>').text(str).html().replace(/\r?\n/g, '<br>');
         }
         function getContentsProc() {
             $.ajax({
@@ -67,24 +67,24 @@
         $(function() {
             getContentsProc();
             getEvaluationProc();
-            $('#post').on("click", function(){
+            $('#post').on("click", function() {
                 $.ajax({
                     type: "@routes.ChatController.postApi.method",
                     url: "@routes.ChatController.postApi.url",
                     data: makeContentPostData(),
                     success: function(json) {
                         $('#content').val('');
-                        no = json.no;
-                        var head = '<div class="head"><span class="no">' + escape(json.no) +
-                                   ' :</span><span class="time">' + escape(json.timeStamp) + '</span></div>';
-                        var shout = '<div class="shout">' + escape(json.content) +'</div>'
-                        var good = '<div class="good"><div class="tooltip"><input type="button" data-no="' + no + '" class="goodbtn" value="👍"><span id="good-' + no + '" /><span id="tt-' + no + '"></span></div></div>'
-                        $('.comment').append(head + shout + good);
+                        getContentsProc();
+                       // no = json.no;
+                       // var head = '<div class="head"><span class="no">' + escape(json.no) +
+                       //            ' :</span><span class="time">' + escape(json.timeStamp) + '</span></div>';
+                       // var shout = '<div class="shout">' + escape(json.content) +'</div>'
+                       // var good = '<div class="good"><div class="tooltip"><input type="button" data-no="' + no + '" class="goodbtn" value="👍"><span id="good-' + no + '" /><span id="tt-' + no + '"></span></div></div>'
+                       // $('.comment').append(head + shout + good);
                     }
                 });
             });
             $(document).on('click', '.goodbtn', function(){
-                getContentsProc();
                 $.ajax({
                     type: "@routes.ChatController.evaluationApi.method",
                     url: "@routes.ChatController.evaluationApi.url",
