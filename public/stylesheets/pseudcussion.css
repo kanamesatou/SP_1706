@@ -259,12 +259,10 @@ a:hover {
 .title {
   margin: 0;
   background: #bbb;
-
-  /*絶対位置指定をして一番上に表示*/
-  position: absolute;
-  top: 0px;
-
   align-items: center;
+  position: fixed;
+  top: 0px;
+  z-index: 2;
 }
 
 .title img {
@@ -287,7 +285,7 @@ a:hover {
   width: 100%;
 
   /*絶対位置指定をして一番下に表示*/
-  position: absolute;
+  position: fixed;
   bottom: 0px;
 }
 
@@ -300,6 +298,7 @@ a:hover {
   padding-top: 5px;
   float: left;
   overflow-x: auto;
+  resize: none;
 }
 
 .input input {
@@ -332,9 +331,11 @@ a:hover {
   font-weight: bold;
 }
 
-/*自身の発言のハイライト*/
-.selfshout {
-  color: green;
+/*バックグラウンドのハイライト*/
+.selfhead {
+  display: inline-block;
+  background-color: rgba(47, 213, 68, 0.3);
+  -webkit-border-radius: 10px;
 }
 
 /*投稿時間*/
@@ -348,18 +349,8 @@ a:hover {
   color: #33f;
 }
 
-/*lgtmボタン*/
-.lgtmBtn {
-  padding: 2px 4px;
-  background: #fff;
-  border-style: solid;
-  border-width: 1px;
-
-  -webkit-border-radius: 5px;
-}
-
-/*rpleyボタン*/
-.rpleyBtn {
+/*ボタン*/
+.btn {
   padding: 2px 4px;
   background: #fff;
   border-style: solid;
@@ -376,6 +367,7 @@ a:hover {
 
 .good {
   margin: 0px 0px 10px 0px;
+  z-index: 0;
 }
 
 
