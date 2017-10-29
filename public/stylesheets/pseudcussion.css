@@ -332,6 +332,11 @@ a:hover {
   font-weight: bold;
 }
 
+/*自身の発言のハイライト*/
+.selfshout {
+  color: green;
+}
+
 /*投稿時間*/
 .time {
   font-size: 0.9em;
