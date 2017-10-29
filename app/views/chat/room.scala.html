@@ -29,11 +29,11 @@
                             var tooltipText = "";
                             if (tooltipTextNo != undefined) {
                                 if (!($('#shout-' + tooltipTextNo + ' > .tooltiptext')[0])) {
-                                    tooltipText = '<div class="tooltiptext">' + $('#shout-' + tooltipTextNo).html() + '</div>';
+                                    tooltipText = '<div class="tooltiptext replyTip">' + $('#shout-' + tooltipTextNo).html() + '</div>';
                                 } else {
                                     var nextTooltip = $('#shout-' + tooltipTextNo + ' > .tooltiptext').html();
                                     var addTooltip = $('#shout-' + tooltipTextNo).text();
-                                    tooltipText = '<div class="tooltiptext">' + nextTooltip + '<br><hr>' + addTooltip.slice(nextTooltip.length) + '</div>';
+                                    tooltipText = '<div class="tooltiptext replyTip">' + nextTooltip + '<br><hr>' + addTooltip.slice(nextTooltip.length) + '</div>';
                                 }
                             }
                             var head = '<div class="head"><span class="no">' + escape(elem.no) +
@@ -67,7 +67,7 @@
                 data: "@FromForm.roomId=@room.id&@FromForm.userId=@user.id",
                 success: function(json) {
                     $.each(json, function(no, nickNames) {
-                        $('#tt-' + no).html('<span class="tooltiptext">' + nickNames.map(function(x){ return escape(x); }).join('<br>') + '</span>');
+                        $('#tt-' + no).html('<span class="tooltiptext lgtmTip">' + nickNames.map(function(x){ return escape(x); }).join('<br>') + '</span>');
                     });
                 }
             });
