@@ -11,11 +11,12 @@ import util.Extension.{AuthenticatableForm, FormExtension}
   */
 case class Chat(id: Long, roomId: Long, no: Int, userId: Long,
                 timeStamp: String, replyTo: Option[Int], content: String) {
-  def toResult: Chat.Result = Chat.Result(
+  def toResult(userIdOpt: Option[Long] = None): Chat.Result = Chat.Result(
     no,
     timeStamp,
     replyTo,
-    content
+    content,
+    userIdOpt.fold(false)(userId.==)
   )
 }
 
@@ -55,7 +56,7 @@ object Chat {
     )
   }
 
-  case class Result(no: Int, timeStamp: String, replyTo: Option[Int], content: String)
+  case class Result(no: Int, timeStamp: String, replyTo: Option[Int], content: String, isSelf: Boolean)
 
   object Result {
     implicit def jsonWrites = Json.writes[Result]

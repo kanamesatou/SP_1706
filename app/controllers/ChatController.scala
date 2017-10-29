@@ -41,7 +41,7 @@ class ChatController extends Controller with Extension.MapJsonWrite {
   def getApi = Action { implicit request =>
     Chat.AjaxForm.opt.map { ajaxForm =>
       User.authenticate(ajaxForm)(ajaxForm.roomId) { _ =>
-        Ok(Json.toJson(ChatService.versioned(ajaxForm.roomId, ajaxForm.no).map(_.toResult)))
+        Ok(Json.toJson(ChatService.versioned(ajaxForm.roomId, ajaxForm.no).map(_.toResult(Some(ajaxForm.userId)))))
       }(Forbidden)
     }.orBadRequest
   }
@@ -79,7 +79,7 @@ class ChatController extends Controller with Extension.MapJsonWrite {
     RoomIdForm.opt.map { form =>
       User.authenticate(form.roomId) { _ =>
         val ranking = EvaluationService.ranking(form.roomId)
-        val all = ChatService.all(form.roomId).map(_.toResult)
+        val all = ChatService.all(form.roomId).map(_.toResult())
         Ok(Json.toJson(ranking.flatMap(no => all.find(_.no == no))))
       }(Forbidden)
     }.orBadRequest
